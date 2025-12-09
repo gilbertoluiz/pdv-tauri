@@ -1,0 +1,13 @@
+[package]
+name = "pdv_suite_tauri"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tauri = { version = "1", features = ["shell-open"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+mysql = "24"
+notify = "6"
+anyhow = "1"

@@ -1,0 +1,19 @@
+{
+  "build": {
+    "distDir": "../ui/dist",
+    "devPath": "http://localhost:5173"
+  },
+  "package": {
+    "productName": "PDV Suite",
+    "version": "0.1.0"
+  },
+  "tauri": {
+    "windows": [
+      { "title": "PDV Suite", "width": 1080, "height": 720 }
+    ],
+    "bundle": {
+      "active": true,
+      "targets": "msi"
+    }
+  }
+}
