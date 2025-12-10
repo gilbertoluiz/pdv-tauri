@@ -15,6 +15,8 @@ import {
   Store,
   Receipt,
   AccountBalance,
+  DynamicForm,
+  Folder,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -67,6 +69,20 @@ const itensMenu: ItemMenu[] = [
         rota: "/app/cadastro/categorias",
         modulo: "cadastro",
         submodulo: "categorias",
+      },
+      {
+        titulo: "Formulário Dinâmico (Teste)",
+        icone: <DynamicForm />,
+        rota: "/app/cadastro/exemplo-formulario",
+        modulo: "cadastro",
+        submodulo: "testes",
+      },
+      {
+        titulo: "Gerenciamento de Arquivos",
+        icone: <Folder />,
+        rota: "/app/cadastro/gerenciamento-arquivos",
+        modulo: "cadastro",
+        submodulo: "testes",
       },
     ],
   },

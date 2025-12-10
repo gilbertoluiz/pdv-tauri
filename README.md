@@ -2,12 +2,33 @@
 
 Uma aplicação PDV moderna construída com Tauri v2, React, TypeScript e Rust.
 
+> 📖 **[Ver Guia de Uso Completo](GUIA_USO.md)** - Instruções detalhadas de uso e como adaptar para sua base de dados
+
+## ✨ Correções Recentes
+
+- ✅ **Telas de teste adicionadas ao menu** - Formulário Dinâmico e Gerenciamento de Arquivos agora acessíveis
+- ✅ **Configuração persiste após reload** - Configurações do banco são carregadas automaticamente
+- ✅ **Campos de formulário funcionando** - Corrigido problema onde texto digitado desaparecia
+- ✅ **CRUD completo implementado** - Clientes e Produtos com conexão MySQL real
+- ✅ **Navegação livre** - Possível trocar de tela a qualquer momento
+- ✅ **Erro TypeScript JSX corrigido** - Namespace JSX resolvido com instalação de @types/react
+
 ## Características
 
 - ✅ Tauri v2 com configuração válida
-- ✅ Backend Rust com comando `salvar_configuracao`
+- ✅ **CRUD Completo com MySQL**:
+  - Sistema de clientes (nome, email, telefone, CPF/CNPJ, endereço, etc)
+  - Sistema de produtos (código, nome, preços, estoque, categoria, etc)
+  - Comandos Rust genéricos para query/comando SQL
+  - Serviço de banco de dados TypeScript reutilizável
+- ✅ Backend Rust com comandos `salvar_configuracao`, `executar_query`, `executar_comando`
+- ✅ **Configuração persistente** - Carrega automaticamente configurações salvas
 - ✅ Frontend React + Vite com React Router
 - ✅ Material-UI (MUI) para interface
+- ✅ **Sistema de formulários dinâmicos**:
+  - Validação automática (CPF, CNPJ, Email, Telefone, etc)
+  - Formatação automática de campos
+  - Telas de exemplo funcionais no menu
 - ✅ **Tailwind CSS** integrado para classes utilitárias
 - ✅ **Prettier** configurado para formatação automática
 - ✅ **ESLint** configurado para qualidade de código
@@ -25,13 +46,13 @@ Uma aplicação PDV moderna construída com Tauri v2, React, TypeScript e Rust.
   - `pages/config/` - Configuração inicial do banco
   - `pages/auth/` - Login, recuperação e alteração de senha
   - `pages/app/` - Dashboard e pedidos
-  - `pages/cadastro/` - Clientes, produtos, etc.
+  - `pages/cadastro/` - Clientes, produtos, formulários de teste, arquivos
   - `pages/configuracoes/` - Configurações do sistema
 - ✅ **Menu hierárquico com 7 módulos**:
   - Dashboard, Cadastros, Pedidos, Financeiro, Relatórios, Configurações
-  - Submenus expansíveis
+  - Submenus expansíveis com telas de teste acessíveis
   - Visibilidade baseada em permissões
-- ✅ TypeScript com configuração moderna
+- ✅ TypeScript com configuração moderna e tipos React corrigidos
 - ✅ Bundle MSI para Windows
 - 🔄 Preparado para updates automáticos (futuro)
 - 🔄 Preparado para licenciamento/ativação (futuro)
