@@ -18,7 +18,7 @@ import {
   DadosFormulario,
   ErrosFormulario,
   ModoFormulario,
-} from "../../types/formulario";
+} from "../types/formulario";
 import {
   validarCPF,
   validarCNPJ,
@@ -29,11 +29,11 @@ import {
   validarTamanhoMaximo,
   validarIntervalo,
   validarURL,
-} from "../../utils/validadores";
-import CampoDocumento from "../campos/CampoDocumento";
-import CampoTelefone from "../campos/CampoTelefone";
-import CampoEmail from "../campos/CampoEmail";
-import CampoMoeda from "../campos/CampoMoeda";
+} from "../utils/validadores";
+import CampoDocumento from "./campos/CampoDocumento";
+import CampoTelefone from "./campos/CampoTelefone";
+import CampoEmail from "./campos/CampoEmail";
+import CampoMoeda from "./campos/CampoMoeda";
 
 interface FormularioDinamicoProps {
   campos: DefinicaoCampo[];
