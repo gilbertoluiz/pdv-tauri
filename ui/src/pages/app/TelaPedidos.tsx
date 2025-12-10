@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  Stack,
-  Button,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-} from "@mui/material";
+import { Stack, Button, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
 
 type Pedido = {
   id: number;
@@ -29,8 +21,7 @@ export default function TelaPedidos() {
     setPedidos((prev) => [p, ...prev]);
   };
 
-  const excluir = (id: number) =>
-    setPedidos((prev) => prev.filter((p) => p.id !== id));
+  const excluir = (id: number) => setPedidos((prev) => prev.filter((p) => p.id !== id));
 
   return (
     <Stack spacing={2}>
@@ -58,11 +49,7 @@ export default function TelaPedidos() {
               <TableCell>{p.status}</TableCell>
               <TableCell>{new Date(p.criadoEm).toLocaleString()}</TableCell>
               <TableCell>
-                <Button
-                  size="small"
-                  color="error"
-                  onClick={() => excluir(p.id)}
-                >
+                <Button size="small" color="error" onClick={() => excluir(p.id)}>
                   Excluir
                 </Button>
               </TableCell>
