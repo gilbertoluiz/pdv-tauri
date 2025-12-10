@@ -8,11 +8,14 @@ Uma aplicação PDV moderna construída com Tauri v2, React, TypeScript e Rust.
 - ✅ Backend Rust com comando `salvar_configuracao`
 - ✅ Frontend React + Vite com React Router
 - ✅ Material-UI (MUI) para interface
-- ✅ Tema claro/escuro
-- ✅ Três telas principais:
-  - Configuração Inicial (IP, usuário, senha do banco)
-  - Login
-  - Pedidos (CRUD básico)
+- ✅ **Tailwind CSS** integrado para classes utilitárias
+- ✅ **Prettier** configurado para formatação automática
+- ✅ **ESLint** configurado para qualidade de código
+- ✅ Tema claro/escuro com **5 esquemas de cores personalizáveis**
+- ✅ Estrutura de páginas organizada por contexto:
+  - `pages/config/` - Configuração Inicial
+  - `pages/auth/` - Autenticação/Login
+  - `pages/app/` - Pedidos e funcionalidades principais
 - ✅ TypeScript com configuração moderna
 - ✅ Bundle MSI para Windows
 - 🔄 Preparado para updates automáticos (futuro)
@@ -77,6 +80,22 @@ cargo tauri dev
 
 A aplicação abrirá automaticamente com hot-reload habilitado.
 
+### Comandos de Desenvolvimento
+
+```bash
+# Formatar código com Prettier
+npm run format
+
+# Verificar formatação
+npm run format:check
+
+# Executar linter (ESLint)
+npm run lint
+
+# Corrigir problemas do linter automaticamente
+npm run lint:fix
+```
+
 ## Build de Produção
 
 ### Build do Frontend
@@ -114,16 +133,28 @@ pdv-tauri/
 │   └── build.rs            # Build script
 ├── ui/                     # Frontend React
 │   ├── src/
-│   │   ├── pages/          # Páginas da aplicação
-│   │   │   ├── TelaConfiguracaoInicial.tsx
-│   │   │   ├── TelaLogin.tsx
-│   │   │   └── TelaPedidos.tsx
-│   │   ├── App.tsx         # Componente raiz com rotas
+│   │   ├── pages/          # Páginas organizadas por contexto
+│   │   │   ├── config/     # Configuração inicial
+│   │   │   │   ├── TelaConfiguracaoInicial.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── auth/       # Autenticação
+│   │   │   │   ├── TelaLogin.tsx
+│   │   │   │   └── index.ts
+│   │   │   └── app/        # Funcionalidades principais
+│   │   │       ├── TelaPedidos.tsx
+│   │   │       └── index.ts
+│   │   ├── App.tsx         # Componente raiz com rotas e seletor de tema
 │   │   ├── main.tsx        # Entry point
-│   │   └── tema.ts         # Tema Material-UI
+│   │   ├── tema.ts         # Sistema de temas com 5 esquemas de cores
+│   │   └── index.css       # Estilos globais e Tailwind
+│   ├── public/             # Arquivos estáticos
 │   ├── package.json
 │   ├── tsconfig.json
-│   └── vite.config.mjs
+│   ├── vite.config.mjs
+│   ├── tailwind.config.js  # Configuração Tailwind CSS
+│   ├── postcss.config.js   # Configuração PostCSS
+│   ├── eslint.config.js    # Configuração ESLint
+│   └── .prettierrc         # Configuração Prettier
 ├── .gitignore
 └── README.md
 ```
@@ -176,8 +207,40 @@ await invoke("salvar_configuracao", {
 - `react` & `react-dom` ^18.2.0
 - `react-router-dom` ^7.10.1
 - `@mui/material` ^7.3.6
+- `tailwindcss` + `@tailwindcss/postcss` - CSS utilitário
 - `vite` ^5.4.21
 - `typescript` ^5.6.0
+- `eslint` + `prettier` - Qualidade e formatação de código
+
+## Sistema de Temas Personalizáveis
+
+O aplicativo inclui um sistema de temas com **5 esquemas de cores** pré-definidos que o cliente pode selecionar:
+
+### Esquemas Disponíveis
+
+1. **Padrão** - Teal (#00897b) + Orange (#ff9800)
+2. **Azul** - Blue (#1976d2) + Pink (#f50057)
+3. **Verde** - Green (#388e3c) + Orange (#ffa726)
+4. **Roxo** - Purple (#7b1fa2) + Cyan (#26c6da)
+5. **Vermelho** - Red (#d32f2f) + Yellow (#fbc02d)
+
+### Como Usar
+
+Os clientes podem alternar entre esquemas de cores através do seletor "Tema" na barra superior do aplicativo. O tema também suporta modo claro/escuro através do switch "Escuro".
+
+### Personalização Adicional
+
+Para adicionar novos esquemas de cores, edite o arquivo `ui/src/tema.ts`:
+
+```typescript
+const coresPreDefinidas: Record<string, CoresPersonalizadas> = {
+  meuTema: {
+    primaria: "#HEX_COR_PRIMARIA",
+    secundaria: "#HEX_COR_SECUNDARIA",
+  },
+  // ... outros temas
+};
+```
 
 ## Próximos Passos (Roadmap)
 
@@ -208,6 +271,34 @@ await invoke("salvar_configuracao", {
 - O `identifier` no `tauri.conf.json` deve permanecer estável para permitir upgrades via MSI
 - Builds são otimizados com `opt-level = "s"` para tamanho reduzido
 - Frontend usa ESNext modules com React JSX moderno
+- **Tailwind CSS** está configurado com `preflight: false` para coexistir com MUI
+- **ESLint** usa a configuração flat (v9+) no arquivo `eslint.config.js`
+- **Prettier** formata automaticamente TypeScript, JavaScript, CSS e JSON
+
+## Ferramentas de Qualidade de Código
+
+### Prettier (Formatação)
+
+Configuração em `.prettierrc`:
+- Ponto e vírgula: Sim
+- Aspas simples: Não (usa aspas duplas)
+- Largura de linha: 100 caracteres
+- Indentação: 2 espaços
+
+### ESLint (Linting)
+
+Configuração em `eslint.config.js`:
+- Regras recomendadas do ESLint e TypeScript
+- Suporte a React Hooks
+- Aviso para variáveis não usadas (ignora prefixo `_`)
+- React JSX moderno (sem necessidade de importar React)
+
+### Tailwind CSS
+
+Configuração em `tailwind.config.js`:
+- Cores customizadas alinhadas com os temas MUI
+- `preflight: false` para não conflitar com MUI
+- Suporta todos os arquivos `.tsx` e `.jsx` em `src/`
 
 ## Solução de Problemas
 
