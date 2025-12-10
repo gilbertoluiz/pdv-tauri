@@ -1,19 +1,24 @@
 {
+  "productName": "Pdv Suite",
+  "version": "0.1.0",
+  "identifier": "com.pdvsuite.app",
   "build": {
-    "distDir": "../ui/dist",
-    "devPath": "http://localhost:5173"
+    "frontendDist": "../ui/dist",
+    "devUrl": "http://localhost:5173"
   },
-  "package": {
-    "productName": "PDV Suite",
-    "version": "0.1.0"
-  },
-  "tauri": {
+  "app": {
     "windows": [
-      { "title": "PDV Suite", "width": 1080, "height": 720 }
-    ],
-    "bundle": {
-      "active": true,
-      "targets": "msi"
-    }
+      {
+        "title": "PDV Suite",
+        "width": 1024,
+        "height": 768,
+        "resizable": true
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi"],
+    "icon": ["icons/icon.ico"]
   }
 }

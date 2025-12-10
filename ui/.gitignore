@@ -1,0 +1,39 @@
+# Node/Vite (frontend)
+ui/node_modules/
+ui/dist/
+ui/.vite/
+ui/.cache/
+ui/.eslintcache
+ui/.DS_Store
+ui/.env.local
+ui/.env.development.local
+ui/.env.test.local
+ui/.env.production.local
+
+# Mantenha lockfiles (é recomendado versionar)
+# ui/package-lock.json
+# ui/pnpm-lock.yaml
+# ui/yarn.lock
+
+# Tauri/Rust (backend)
+src-tauri/target/
+src-tauri/.fingerprint/
+src-tauri/.cargo/
+src-tauri/Cargo.lock
+
+# Logs e temporários
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tmp
+
+# Sistemas/OS
+.DS_Store
+Thumbs.db
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp

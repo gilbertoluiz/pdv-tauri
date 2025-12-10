@@ -1,13 +1,18 @@
 [package]
-name = "pdv_suite_tauri"
+name = "pdv-suite"
 version = "0.1.0"
+description = "PDV Suite Tauri App"
+authors = ["Seu Nome"]
 edition = "2021"
 
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
 [dependencies]
-tauri = { version = "1", features = ["shell-open"] }
+tauri = { version = "2", features = [] }                # sem features "macros"
+tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tokio = { version = "1", features = ["full"] }
-mysql = "24"
-notify = "6"
-anyhow = "1"
+
+[profile.release]
+opt-level = "s"

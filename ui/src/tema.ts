@@ -1,6 +1,11 @@
 import { createTheme } from "@mui/material/styles";
-export const criarTema = (escuro: boolean) =>
-  createTheme({
-    palette: { mode: escuro ? "dark" : "light" },
-    shape: { borderRadius: 10 }
+
+export function criarTema(escuro: boolean) {
+  return createTheme({
+    palette: {
+      mode: escuro ? "dark" : "light",
+      primary: { main: "#00897b" }, // teal
+      secondary: { main: "#ff9800" }, // orange
+    },
   });
+}
