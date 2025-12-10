@@ -177,6 +177,11 @@ async fn verificar_caminho_existe(caminho: String) -> Result<bool, String> {
   Ok(path.exists())
 }
 
+// Helper function to convert string params to MySQL values
+fn converter_params_para_mysql(params: &[String]) -> Vec<mysql::Value> {
+  params.iter().map(|p| mysql::Value::from(p.as_str())).collect()
+}
+
 // Generic database query command for SELECT operations
 #[tauri::command]
 async fn executar_query(
@@ -199,7 +204,7 @@ async fn executar_query(
   let mut conn = pool.get_conn().map_err(|e| format!("Erro ao conectar ao banco: {}", e))?;
 
   // Convert params to query params
-  let query_params: Vec<mysql::Value> = params.iter().map(|p| mysql::Value::from(p.as_str())).collect();
+  let query_params = converter_params_para_mysql(&params);
   
   let result: Vec<mysql::Row> = conn
     .exec(&query, query_params)
@@ -256,7 +261,7 @@ async fn executar_comando(
   let mut conn = pool.get_conn().map_err(|e| format!("Erro ao conectar ao banco: {}", e))?;
 
   // Convert params to query params
-  let query_params: Vec<mysql::Value> = params.iter().map(|p| mysql::Value::from(p.as_str())).collect();
+  let query_params = converter_params_para_mysql(&params);
   
   conn
     .exec_drop(&comando, query_params)

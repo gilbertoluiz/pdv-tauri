@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import { Add, Edit, Delete, CheckCircle, Cancel } from "@mui/icons-material";
 import FormularioDinamico from "../../components/FormularioDinamico";
+import DialogoConfirmacao from "../../components/DialogoConfirmacao";
 import { DefinicaoCampo, DadosFormulario } from "../../types/formulario";
 import { DatabaseService, Produto } from "../../services/database";
 
@@ -29,7 +30,9 @@ export default function TelaProdutos() {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [dialogAberto, setDialogAberto] = useState(false);
+  const [dialogExcluirAberto, setDialogExcluirAberto] = useState(false);
   const [produtoEditando, setProdutoEditando] = useState<Produto | null>(null);
+  const [produtoExcluindo, setProdutoExcluindo] = useState<Produto | null>(null);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
 
@@ -210,20 +213,30 @@ export default function TelaProdutos() {
     }
   };
 
-  const handleExcluir = async (id: number) => {
-    if (!confirm("Tem certeza que deseja excluir este produto?")) {
-      return;
-    }
+  const handleAbrirDialogoExcluir = (produto: Produto) => {
+    setProdutoExcluindo(produto);
+    setDialogExcluirAberto(true);
+  };
+
+  const handleFecharDialogoExcluir = () => {
+    setDialogExcluirAberto(false);
+    setProdutoExcluindo(null);
+  };
+
+  const handleConfirmarExcluir = async () => {
+    if (!produtoExcluindo?.id) return;
 
     try {
       setErro("");
-      await DatabaseService.excluirProduto(id);
+      await DatabaseService.excluirProduto(produtoExcluindo.id);
       setSucesso("Produto excluído com sucesso!");
       await carregarProdutos();
       setTimeout(() => setSucesso(""), 3000);
     } catch (error) {
       setErro("Erro ao excluir produto: " + String(error));
       console.error(error);
+    } finally {
+      handleFecharDialogoExcluir();
     }
   };
 
@@ -326,7 +339,7 @@ export default function TelaProdutos() {
                       </IconButton>
                       <IconButton
                         size="small"
-                        onClick={() => handleExcluir(produto.id!)}
+                        onClick={() => handleAbrirDialogoExcluir(produto)}
                         color="error"
                       >
                         <Delete fontSize="small" />
@@ -358,6 +371,18 @@ export default function TelaProdutos() {
           </Box>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog de confirmação de exclusão */}
+      <DialogoConfirmacao
+        aberto={dialogExcluirAberto}
+        titulo="Excluir Produto"
+        mensagem={`Tem certeza que deseja excluir o produto "${produtoExcluindo?.nome}" (Código: ${produtoExcluindo?.codigo})? Esta ação não pode ser desfeita.`}
+        onConfirmar={handleConfirmarExcluir}
+        onCancelar={handleFecharDialogoExcluir}
+        textoConfirmar="Excluir"
+        textoCancelar="Cancelar"
+        corConfirmar="error"
+      />
     </Box>
   );
 }

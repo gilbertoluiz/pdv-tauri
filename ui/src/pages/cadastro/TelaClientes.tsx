@@ -15,13 +15,13 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Alert,
   Chip,
   CircularProgress,
 } from "@mui/material";
 import { Add, Edit, Delete, CheckCircle, Cancel } from "@mui/icons-material";
 import FormularioDinamico from "../../components/FormularioDinamico";
+import DialogoConfirmacao from "../../components/DialogoConfirmacao";
 import { DefinicaoCampo, DadosFormulario } from "../../types/formulario";
 import { DatabaseService, Cliente } from "../../services/database";
 
@@ -30,7 +30,9 @@ export default function TelaClientes() {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [dialogAberto, setDialogAberto] = useState(false);
+  const [dialogExcluirAberto, setDialogExcluirAberto] = useState(false);
   const [clienteEditando, setClienteEditando] = useState<Cliente | null>(null);
+  const [clienteExcluindo, setClienteExcluindo] = useState<Cliente | null>(null);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
 
@@ -198,20 +200,30 @@ export default function TelaClientes() {
     }
   };
 
-  const handleExcluir = async (id: number) => {
-    if (!confirm("Tem certeza que deseja excluir este cliente?")) {
-      return;
-    }
+  const handleAbrirDialogoExcluir = (cliente: Cliente) => {
+    setClienteExcluindo(cliente);
+    setDialogExcluirAberto(true);
+  };
+
+  const handleFecharDialogoExcluir = () => {
+    setDialogExcluirAberto(false);
+    setClienteExcluindo(null);
+  };
+
+  const handleConfirmarExcluir = async () => {
+    if (!clienteExcluindo?.id) return;
 
     try {
       setErro("");
-      await DatabaseService.excluirCliente(id);
+      await DatabaseService.excluirCliente(clienteExcluindo.id);
       setSucesso("Cliente excluído com sucesso!");
       await carregarClientes();
       setTimeout(() => setSucesso(""), 3000);
     } catch (error) {
       setErro("Erro ao excluir cliente: " + String(error));
       console.error(error);
+    } finally {
+      handleFecharDialogoExcluir();
     }
   };
 
@@ -303,7 +315,7 @@ export default function TelaClientes() {
                       </IconButton>
                       <IconButton
                         size="small"
-                        onClick={() => handleExcluir(cliente.id!)}
+                        onClick={() => handleAbrirDialogoExcluir(cliente)}
                         color="error"
                       >
                         <Delete fontSize="small" />
@@ -335,6 +347,18 @@ export default function TelaClientes() {
           </Box>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog de confirmação de exclusão */}
+      <DialogoConfirmacao
+        aberto={dialogExcluirAberto}
+        titulo="Excluir Cliente"
+        mensagem={`Tem certeza que deseja excluir o cliente "${clienteExcluindo?.nome}"? Esta ação não pode ser desfeita.`}
+        onConfirmar={handleConfirmarExcluir}
+        onCancelar={handleFecharDialogoExcluir}
+        textoConfirmar="Excluir"
+        textoCancelar="Cancelar"
+        corConfirmar="error"
+      />
     </Box>
   );
 }

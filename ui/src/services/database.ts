@@ -33,6 +33,11 @@ export interface Produto {
 }
 
 export class DatabaseService {
+  // Helper function to convert boolean to string
+  private static boolToString(value?: boolean): string {
+    return String(value ?? true);
+  }
+
   // Initialize database tables
   static async inicializarTabelas(): Promise<string> {
     return await invoke<string>("inicializar_tabelas");
@@ -80,7 +85,7 @@ export class DatabaseService {
       cliente.endereco || "",
       cliente.cidade || "",
       cliente.estado || "",
-      String(cliente.ativo !== false),
+      this.boolToString(cliente.ativo),
     ];
     return await this.executarComando(comando, params);
   }
@@ -101,7 +106,7 @@ export class DatabaseService {
       cliente.endereco || "",
       cliente.cidade || "",
       cliente.estado || "",
-      String(cliente.ativo !== false),
+      this.boolToString(cliente.ativo),
       String(id),
     ];
     return await this.executarComando(comando, params);
@@ -141,7 +146,7 @@ export class DatabaseService {
       String(produto.estoque || 0),
       String(produto.estoque_minimo || 0),
       produto.data_validade || "",
-      String(produto.ativo !== false),
+      this.boolToString(produto.ativo),
     ];
     return await this.executarComando(comando, params);
   }
@@ -165,7 +170,7 @@ export class DatabaseService {
       String(produto.estoque || 0),
       String(produto.estoque_minimo || 0),
       produto.data_validade || "",
-      String(produto.ativo !== false),
+      this.boolToString(produto.ativo),
       String(id),
     ];
     return await this.executarComando(comando, params);
