@@ -31,9 +31,14 @@ export default function CampoMoeda({
     const inputValue = e.target.value;
     // Remove all non-numeric characters
     const numeric = inputValue.replace(/\D/g, "");
-    const numericValue = parseFloat(numeric) / 100;
+    
+    // Convert cents to main currency unit
+    const numericValue = numeric ? parseFloat(numeric) / 100 : 0;
 
+    // Update parent with value in main currency unit
     onChange(numericValue);
+    
+    // Format for display (pass numeric string which will be converted to cents-based value)
     setDisplayValue(formatarMoeda(numeric));
   };
 

@@ -15,6 +15,7 @@ import {
   DialogContentText,
 } from "@mui/material";
 import { invoke } from "@tauri-apps/api/core";
+import { DEFAULT_DB_CONFIG } from "../../constants/dbConfig";
 
 interface Config {
   servidorIp: string;
@@ -22,16 +23,11 @@ interface Config {
   senhaBanco: string;
   porta: number;
   nomeBanco: string;
+  caminhoUnimake?: string;
 }
 
 export default function TelaConfiguracaoBanco() {
-  const [config, setConfig] = useState<Config>({
-    servidorIp: "127.0.0.1",
-    usuarioBanco: "root",
-    senhaBanco: "",
-    porta: 3306,
-    nomeBanco: "pdv",
-  });
+  const [config, setConfig] = useState<Config>(DEFAULT_DB_CONFIG);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [testando, setTestando] = useState(false);
@@ -86,6 +82,7 @@ export default function TelaConfiguracaoBanco() {
         senhaBanco: config.senhaBanco,
         porta: config.porta,
         nomeBanco: config.nomeBanco,
+        caminhoUnimake: config.caminhoUnimake || null,
       });
       setSucesso(mensagem);
     } catch (e) {
@@ -103,13 +100,7 @@ export default function TelaConfiguracaoBanco() {
       setSucesso(mensagem);
       setDialogExcluir(false);
       // Reset to defaults
-      setConfig({
-        servidorIp: "127.0.0.1",
-        usuarioBanco: "root",
-        senhaBanco: "",
-        porta: 3306,
-        nomeBanco: "pdv",
-      });
+      setConfig(DEFAULT_DB_CONFIG);
     } catch (e) {
       setErro("Erro ao excluir configuração: " + e);
       setDialogExcluir(false);
@@ -178,6 +169,14 @@ export default function TelaConfiguracaoBanco() {
             value={config.senhaBanco}
             onChange={(e) => setConfig({ ...config, senhaBanco: e.target.value })}
             fullWidth
+          />
+          <TextField
+            label="Caminho do Unimake (Opcional)"
+            value={config.caminhoUnimake || ""}
+            onChange={(e) => setConfig({ ...config, caminhoUnimake: e.target.value })}
+            fullWidth
+            placeholder="C:\Unimake"
+            helperText="Deixe em branco se não usar Unimake. Se preenchido, o caminho deve existir."
           />
         </Stack>
       </Paper>

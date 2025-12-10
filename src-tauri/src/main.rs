@@ -13,6 +13,7 @@ struct Config {
   senha_banco: String,
   porta: u16,
   nome_banco: String,
+  caminho_unimake: Option<String>,
 }
 
 // Helper function to get config path
@@ -97,6 +98,84 @@ async fn excluir_configuracao(app: AppHandle) -> Result<String, String> {
   }
 }
 
+// File operations for TXT/XML
+#[tauri::command]
+async fn gerar_txt(
+  caminho: String,
+  conteudo: String,
+) -> Result<String, String> {
+  let path = std::path::Path::new(&caminho);
+  
+  // Create parent directories if they don't exist
+  if let Some(parent) = path.parent() {
+    fs::create_dir_all(parent).map_err(|e| format!("Erro ao criar diretórios: {}", e))?;
+  }
+  
+  fs::write(path, conteudo).map_err(|e| format!("Erro ao escrever arquivo: {}", e))?;
+  
+  Ok(format!("Arquivo gerado com sucesso em: {}", caminho))
+}
+
+#[tauri::command]
+async fn ler_arquivo(caminho: String) -> Result<String, String> {
+  let path = std::path::Path::new(&caminho);
+  
+  if !path.exists() {
+    return Err(format!("Arquivo não encontrado: {}", caminho));
+  }
+  
+  fs::read_to_string(path).map_err(|e| format!("Erro ao ler arquivo: {}", e))
+}
+
+#[tauri::command]
+async fn listar_arquivos_diretorio(
+  caminho: String,
+  extensao: Option<String>,
+) -> Result<Vec<String>, String> {
+  let path = std::path::Path::new(&caminho);
+  
+  if !path.exists() {
+    return Err(format!("Diretório não encontrado: {}", caminho));
+  }
+  
+  if !path.is_dir() {
+    return Err(format!("Caminho não é um diretório: {}", caminho));
+  }
+  
+  let entries = fs::read_dir(path).map_err(|e| format!("Erro ao ler diretório: {}", e))?;
+  
+  let mut files = Vec::new();
+  
+  for entry in entries {
+    if let Ok(entry) = entry {
+      let path = entry.path();
+      if path.is_file() {
+        if let Some(ref ext) = extensao {
+          if let Some(file_ext) = path.extension() {
+            if file_ext == ext.as_str() {
+              if let Some(path_str) = path.to_str() {
+                files.push(path_str.to_string());
+              }
+            }
+          }
+        } else {
+          if let Some(path_str) = path.to_str() {
+            files.push(path_str.to_string());
+          }
+        }
+      }
+    }
+  }
+  
+  Ok(files)
+}
+
+#[tauri::command]
+async fn verificar_caminho_existe(caminho: String) -> Result<bool, String> {
+  let path = std::path::Path::new(&caminho);
+  Ok(path.exists())
+}
+
 #[tauri::command]
 async fn salvar_configuracao(
   app: AppHandle,
@@ -105,13 +184,25 @@ async fn salvar_configuracao(
   senha_banco: String,
   porta: u16,
   nome_banco: String,
+  caminho_unimake: Option<String>,
 ) -> Result<String, String> {
+  // Validate Unimake path if provided
+  if let Some(ref path) = caminho_unimake {
+    if !path.is_empty() {
+      let unimake_path = std::path::Path::new(path);
+      if !unimake_path.exists() {
+        return Err(format!("Caminho do Unimake não existe: {}", path));
+      }
+    }
+  }
+
   let cfg = Config {
     servidor_ip,
     usuario_banco,
     senha_banco,
     porta,
     nome_banco,
+    caminho_unimake,
   };
 
   // Test connection before saving
@@ -137,7 +228,11 @@ fn main() {
       verificar_configuracao,
       obter_configuracao,
       testar_conexao,
-      excluir_configuracao
+      excluir_configuracao,
+      gerar_txt,
+      ler_arquivo,
+      listar_arquivos_diretorio,
+      verificar_caminho_existe
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

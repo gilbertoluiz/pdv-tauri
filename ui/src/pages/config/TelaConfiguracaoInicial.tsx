@@ -3,13 +3,15 @@ import { Stack, TextField, Button, Typography, Alert, Box, CircularProgress } fr
 import { invoke } from "@tauri-apps/api/core";
 import { useNavigate } from "react-router-dom";
 import LayoutSimples from "../../layouts/LayoutSimples";
+import { DEFAULT_DB_CONFIG } from "../../constants/dbConfig";
 
 export default function TelaConfiguracaoInicial() {
-  const [ip, setIp] = useState("127.0.0.1");
-  const [usuario, setUsuario] = useState("root");
-  const [senha, setSenha] = useState("");
-  const [porta, setPorta] = useState(3306);
-  const [nomeBanco, setNomeBanco] = useState("pdv");
+  const [ip, setIp] = useState(DEFAULT_DB_CONFIG.servidorIp);
+  const [usuario, setUsuario] = useState(DEFAULT_DB_CONFIG.usuarioBanco);
+  const [senha, setSenha] = useState(DEFAULT_DB_CONFIG.senhaBanco);
+  const [porta, setPorta] = useState(DEFAULT_DB_CONFIG.porta);
+  const [nomeBanco, setNomeBanco] = useState(DEFAULT_DB_CONFIG.nomeBanco);
+  const [caminhoUnimake, setCaminhoUnimake] = useState(DEFAULT_DB_CONFIG.caminhoUnimake);
   const [loading, setLoading] = useState(false);
   const [testando, setTestando] = useState(false);
   const [erro, setErro] = useState("");
@@ -47,6 +49,7 @@ export default function TelaConfiguracaoInicial() {
         senhaBanco: senha,
         porta: porta,
         nomeBanco: nomeBanco,
+        caminhoUnimake: caminhoUnimake || null,
       });
       setSucesso(mensagem);
       setTimeout(() => {
@@ -118,6 +121,14 @@ export default function TelaConfiguracaoInicial() {
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           fullWidth
+        />
+        <TextField
+          label="Caminho do Unimake (Opcional)"
+          value={caminhoUnimake}
+          onChange={(e) => setCaminhoUnimake(e.target.value)}
+          fullWidth
+          placeholder="C:\Unimake"
+          helperText="Deixe em branco se não usar Unimake"
         />
         <Button 
           variant="outlined" 

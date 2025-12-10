@@ -71,9 +71,20 @@ export function formatarCEP(cep: string): string {
 
 /**
  * Formats currency (Brazilian Real)
+ * @param value - Number value or string in cents (e.g., "1000" = R$ 10,00)
  */
 export function formatarMoeda(value: number | string): string {
-  const numValue = typeof value === "string" ? parseFloat(value.replace(/\D/g, "")) / 100 : value;
+  let numValue: number;
+  
+  if (typeof value === "string") {
+    // String is expected to be in cents (e.g., "1000" for R$ 10,00)
+    const cleaned = value.replace(/\D/g, "");
+    numValue = cleaned ? parseFloat(cleaned) / 100 : 0;
+  } else {
+    // Number is expected to be in the main currency unit (e.g., 10.00 for R$ 10,00)
+    numValue = value;
+  }
+  
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -81,10 +92,13 @@ export function formatarMoeda(value: number | string): string {
 }
 
 /**
- * Parses currency string to number
+ * Parses currency string to number (in main currency unit)
  */
 export function parseMoeda(value: string): number {
   const cleaned = value.replace(/\D/g, "");
+  if (!cleaned || cleaned === "0") {
+    return 0;
+  }
   return parseFloat(cleaned) / 100;
 }
 

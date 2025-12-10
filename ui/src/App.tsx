@@ -20,6 +20,7 @@ import TelaConfiguracoes from "./pages/configuracoes/TelaConfiguracoes";
 import TelaClientes from "./pages/cadastro/TelaClientes";
 import TelaProdutos from "./pages/cadastro/TelaProdutos";
 import TelaExemploFormularioDinamico from "./pages/cadastro/TelaExemploFormularioDinamico";
+import TelaGerenciamentoArquivos from "./pages/cadastro/TelaGerenciamentoArquivos";
 
 function RotaPrivada({ children }: { children: JSX.Element }) {
   const { autenticado } = useAuth();
@@ -121,6 +122,7 @@ function AppRotas() {
                     <Route path="cadastro/clientes" element={<TelaClientes />} />
                     <Route path="cadastro/produtos" element={<TelaProdutos />} />
                     <Route path="cadastro/exemplo-formulario" element={<TelaExemploFormularioDinamico />} />
+                    <Route path="cadastro/gerenciamento-arquivos" element={<TelaGerenciamentoArquivos />} />
                     <Route
                       path="cadastro/fornecedores"
                       element={
