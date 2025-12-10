@@ -12,10 +12,25 @@ Uma aplicação PDV moderna construída com Tauri v2, React, TypeScript e Rust.
 - ✅ **Prettier** configurado para formatação automática
 - ✅ **ESLint** configurado para qualidade de código
 - ✅ Tema claro/escuro com **5 esquemas de cores personalizáveis**
-- ✅ Estrutura de páginas organizada por contexto:
-  - `pages/config/` - Configuração Inicial
-  - `pages/auth/` - Autenticação/Login
-  - `pages/app/` - Pedidos e funcionalidades principais
+- ✅ **Sistema de autenticação completo**:
+  - Login com validação
+  - Recuperação de senha por email
+  - Alteração de senha com validações
+  - Gerenciamento de permissões por módulo
+- ✅ **Layouts responsivos**:
+  - Layout simples para autenticação e configuração
+  - Layout principal com sidebar retrátil
+  - Menu lateral com controle de permissões
+- ✅ **Estrutura organizada de páginas**:
+  - `pages/config/` - Configuração inicial do banco
+  - `pages/auth/` - Login, recuperação e alteração de senha
+  - `pages/app/` - Dashboard e pedidos
+  - `pages/cadastro/` - Clientes, produtos, etc.
+  - `pages/configuracoes/` - Configurações do sistema
+- ✅ **Menu hierárquico com 7 módulos**:
+  - Dashboard, Cadastros, Pedidos, Financeiro, Relatórios, Configurações
+  - Submenus expansíveis
+  - Visibilidade baseada em permissões
 - ✅ TypeScript com configuração moderna
 - ✅ Bundle MSI para Windows
 - 🔄 Preparado para updates automáticos (futuro)
@@ -239,6 +254,97 @@ const coresPreDefinidas: Record<string, CoresPersonalizadas> = {
     secundaria: "#HEX_COR_SECUNDARIA",
   },
   // ... outros temas
+};
+```
+
+## Sistema de Autenticação e Permissões
+
+### Visão Geral
+
+O aplicativo inclui um sistema completo de autenticação com gerenciamento de permissões baseado em módulos e submódulos.
+
+### Credenciais de Teste
+
+- **Email**: `admin@pdv.com`
+- **Senha**: `admin`
+
+### Funcionalidades de Autenticação
+
+1. **Login** (`/login`)
+   - Validação de credenciais
+   - Redirecionamento automático para dashboard
+   - Mensagens de erro descritivas
+
+2. **Recuperação de Senha** (`/recuperar-senha`)
+   - Solicitação por email
+   - Confirmação visual
+   - Mock pronto para integração com API
+
+3. **Alteração de Senha** (`/app/configuracoes`)
+   - Requer senha atual
+   - Validação de força (mínimo 6 caracteres)
+   - Confirmação de senha
+   - Previne reutilização da senha atual
+
+### Sistema de Permissões
+
+As permissões são organizadas por módulo e submódulo:
+
+```typescript
+interface Permissao {
+  modulo: string;        // Ex: "cadastro", "pedidos"
+  submodulo?: string;    // Ex: "clientes", "produtos"
+  ler: boolean;
+  criar: boolean;
+  editar: boolean;
+  excluir: boolean;
+}
+```
+
+### Módulos Disponíveis
+
+1. **Dashboard** - Visão geral e estatísticas
+2. **Cadastros**
+   - Clientes
+   - Produtos
+   - Fornecedores
+   - Categorias
+3. **Pedidos** - Gerenciamento de pedidos
+4. **Financeiro**
+   - Contas a Pagar
+   - Contas a Receber
+5. **Relatórios**
+   - Vendas
+   - Estoque
+6. **Configurações** - Sistema, segurança, geral
+
+### Layouts
+
+#### LayoutSimples
+- Usado para: login, recuperação de senha, configuração inicial
+- Design centralizado e limpo
+- Sem navegação ou menu
+
+#### LayoutPrincipal
+- Usado para: todas as páginas após login
+- AppBar com:
+  - Seletor de tema
+  - Toggle dark/light mode
+  - Menu do usuário (perfil, configurações, sair)
+- Sidebar retrátil (280px) com menu hierárquico
+- Controle de permissões automático
+
+### Integração com Backend
+
+O sistema está preparado para integração com API/Tauri:
+
+```typescript
+// ui/src/contexts/AuthContext.tsx
+const login = async (email: string, senha: string) => {
+  // Substituir por chamada real:
+  // const response = await invoke("autenticar", { email, senha });
+  // const usuario = response.usuario;
+  // setUsuario(usuario);
 };
 ```
 
