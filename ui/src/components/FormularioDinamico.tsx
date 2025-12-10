@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Grid,
@@ -56,14 +56,8 @@ export default function FormularioDinamico({
   textoSalvar,
   textoCancelar,
 }: FormularioDinamicoProps) {
-  const [dados, setDados] = useState<DadosFormulario>({});
-  const [erros, setErros] = useState<ErrosFormulario>({});
-  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
-
-  const somenteLeitura = modo === "visualizar";
-
-  // Initialize form data
-  useEffect(() => {
+  // Initialize form data with useMemo to avoid recreating on every render
+  const dadosIniciaisCalculados = useMemo(() => {
     const dadosInicializados: DadosFormulario = {};
     campos.forEach((campo) => {
       if (dadosIniciais[campo.nome] !== undefined) {
@@ -85,8 +79,21 @@ export default function FormularioDinamico({
         }
       }
     });
-    setDados(dadosInicializados);
+    return dadosInicializados;
   }, [campos, dadosIniciais]);
+
+  const [dados, setDados] = useState<DadosFormulario>(dadosIniciaisCalculados);
+  const [erros, setErros] = useState<ErrosFormulario>({});
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+
+  const somenteLeitura = modo === "visualizar";
+
+  // Reset form data when dadosIniciaisCalculados changes (e.g., switching between create/edit)
+  useEffect(() => {
+    setDados(dadosIniciaisCalculados);
+    setErros({});
+    setTouched({});
+  }, [dadosIniciaisCalculados]);
 
   const validarCampo = (campo: DefinicaoCampo, valor: any): string | undefined => {
     // Check required

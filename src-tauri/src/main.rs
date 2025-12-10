@@ -177,6 +177,157 @@ async fn verificar_caminho_existe(caminho: String) -> Result<bool, String> {
   Ok(path.exists())
 }
 
+// Helper function to convert string params to MySQL values
+fn converter_params_para_mysql(params: &[String]) -> Vec<mysql::Value> {
+  params.iter().map(|p| mysql::Value::from(p.as_str())).collect()
+}
+
+// Generic database query command for SELECT operations
+#[tauri::command]
+async fn executar_query(
+  app: AppHandle,
+  query: String,
+  params: Vec<String>,
+) -> Result<Vec<serde_json::Value>, String> {
+  let cfg = obter_configuracao(app).await?;
+  
+  let url = format!(
+    "mysql://{}:{}@{}:{}/{}",
+    cfg.usuario_banco,
+    cfg.senha_banco,
+    cfg.servidor_ip,
+    cfg.porta,
+    cfg.nome_banco
+  );
+
+  let pool = Pool::new(url.as_str()).map_err(|e| format!("Erro ao criar pool: {}", e))?;
+  let mut conn = pool.get_conn().map_err(|e| format!("Erro ao conectar ao banco: {}", e))?;
+
+  // Convert params to query params
+  let query_params = converter_params_para_mysql(&params);
+  
+  let result: Vec<mysql::Row> = conn
+    .exec(&query, query_params)
+    .map_err(|e| format!("Erro ao executar query: {}", e))?;
+
+  // Convert rows to JSON
+  let mut json_result = Vec::new();
+  for row in result {
+    let mut obj = serde_json::Map::new();
+    for (idx, col) in row.columns_ref().iter().enumerate() {
+      let col_name = col.name_str().to_string();
+      let value: mysql::Value = row.get(idx).unwrap_or(mysql::Value::NULL);
+      
+      let json_value = match value {
+        mysql::Value::NULL => serde_json::Value::Null,
+        mysql::Value::Int(i) => serde_json::Value::Number(i.into()),
+        mysql::Value::UInt(u) => serde_json::Value::Number(u.into()),
+        mysql::Value::Float(f) => serde_json::Number::from_f64(f).map(serde_json::Value::Number).unwrap_or(serde_json::Value::Null),
+        mysql::Value::Double(d) => serde_json::Number::from_f64(d).map(serde_json::Value::Number).unwrap_or(serde_json::Value::Null),
+        mysql::Value::Bytes(b) => serde_json::Value::String(String::from_utf8_lossy(&b).to_string()),
+        mysql::Value::Date(y, m, d, h, min, s, _) => {
+          serde_json::Value::String(format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}", y, m, d, h, min, s))
+        },
+        mysql::Value::Time(_, _, _, _, _, _) => serde_json::Value::String(format!("{:?}", value)),
+      };
+      
+      obj.insert(col_name, json_value);
+    }
+    json_result.push(serde_json::Value::Object(obj));
+  }
+
+  Ok(json_result)
+}
+
+// Generic database command for INSERT/UPDATE/DELETE operations
+#[tauri::command]
+async fn executar_comando(
+  app: AppHandle,
+  comando: String,
+  params: Vec<String>,
+) -> Result<u64, String> {
+  let cfg = obter_configuracao(app).await?;
+  
+  let url = format!(
+    "mysql://{}:{}@{}:{}/{}",
+    cfg.usuario_banco,
+    cfg.senha_banco,
+    cfg.servidor_ip,
+    cfg.porta,
+    cfg.nome_banco
+  );
+
+  let pool = Pool::new(url.as_str()).map_err(|e| format!("Erro ao criar pool: {}", e))?;
+  let mut conn = pool.get_conn().map_err(|e| format!("Erro ao conectar ao banco: {}", e))?;
+
+  // Convert params to query params
+  let query_params = converter_params_para_mysql(&params);
+  
+  conn
+    .exec_drop(&comando, query_params)
+    .map_err(|e| format!("Erro ao executar comando: {}", e))?;
+
+  Ok(conn.affected_rows())
+}
+
+// Create tables if they don't exist
+#[tauri::command]
+async fn inicializar_tabelas(app: AppHandle) -> Result<String, String> {
+  let cfg = obter_configuracao(app).await?;
+  
+  let url = format!(
+    "mysql://{}:{}@{}:{}/{}",
+    cfg.usuario_banco,
+    cfg.senha_banco,
+    cfg.servidor_ip,
+    cfg.porta,
+    cfg.nome_banco
+  );
+
+  let pool = Pool::new(url.as_str()).map_err(|e| format!("Erro ao criar pool: {}", e))?;
+  let mut conn = pool.get_conn().map_err(|e| format!("Erro ao conectar ao banco: {}", e))?;
+
+  // Create clientes table
+  conn.query_drop(
+    r"CREATE TABLE IF NOT EXISTS clientes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nome VARCHAR(255) NOT NULL,
+      email VARCHAR(255),
+      telefone VARCHAR(20),
+      cpf VARCHAR(14),
+      cnpj VARCHAR(18),
+      endereco TEXT,
+      cidade VARCHAR(100),
+      estado VARCHAR(2),
+      ativo BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )"
+  ).map_err(|e| format!("Erro ao criar tabela clientes: {}", e))?;
+
+  // Create produtos table
+  conn.query_drop(
+    r"CREATE TABLE IF NOT EXISTS produtos (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      codigo VARCHAR(50) UNIQUE NOT NULL,
+      nome VARCHAR(255) NOT NULL,
+      descricao TEXT,
+      categoria VARCHAR(100),
+      unidade VARCHAR(10),
+      preco_custo DECIMAL(10, 2) DEFAULT 0,
+      preco_venda DECIMAL(10, 2) NOT NULL,
+      estoque INT DEFAULT 0,
+      estoque_minimo INT DEFAULT 0,
+      data_validade DATE,
+      ativo BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )"
+  ).map_err(|e| format!("Erro ao criar tabela produtos: {}", e))?;
+
+  Ok("Tabelas inicializadas com sucesso!".to_string())
+}
+
 #[tauri::command]
 async fn salvar_configuracao(
   app: AppHandle,
@@ -233,7 +384,10 @@ fn main() {
       gerar_txt,
       ler_arquivo,
       listar_arquivos_diretorio,
-      verificar_caminho_existe
+      verificar_caminho_existe,
+      executar_query,
+      executar_comando,
+      inicializar_tabelas
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
