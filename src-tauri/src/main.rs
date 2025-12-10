@@ -79,6 +79,7 @@ async fn testar_conexao(
     senha_banco,
     porta,
     nome_banco,
+    caminho_unimake: None, // Not needed for database connection test
   };
 
   testar_conexao_db(&cfg)?;

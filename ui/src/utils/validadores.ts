@@ -80,10 +80,22 @@ export function validarCNPJ(cnpj: string): boolean {
 }
 
 /**
- * Validates email format
+ * Validates email format (basic validation for common cases)
+ * For production, consider using a more robust email validation library
  */
 export function validarEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // More comprehensive email regex that handles most common cases
+  // Still not RFC 5322 compliant but much better than basic validation
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  
+  // Additional basic checks
+  if (!email || email.length > 254) return false; // RFC 5321
+  if (email.split('@').length !== 2) return false;
+  
+  const [localPart, domain] = email.split('@');
+  if (!localPart || localPart.length > 64) return false; // RFC 5321
+  if (!domain || domain.length > 253) return false;
+  
   return emailRegex.test(email);
 }
 

@@ -1,5 +1,5 @@
 import { TextField, InputAdornment } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formatarMoeda, parseMoeda } from "../../utils/formatadores";
 
 interface CampoMoedaProps {
@@ -26,6 +26,11 @@ export default function CampoMoeda({
   max,
 }: CampoMoedaProps) {
   const [displayValue, setDisplayValue] = useState(formatarMoeda(value));
+
+  // Sync displayValue when value prop changes
+  useEffect(() => {
+    setDisplayValue(formatarMoeda(value));
+  }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
