@@ -1,6 +1,7 @@
 import { Typography, Paper, Box, Tabs, Tab } from "@mui/material";
 import { useState } from "react";
 import TelaAlterarSenha from "../auth/TelaAlterarSenha";
+import TelaConfiguracaoBanco from "./TelaConfiguracaoBanco";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -38,7 +39,7 @@ export default function TelaConfiguracoes() {
         >
           <Tab label="Geral" />
           <Tab label="Segurança" />
-          <Tab label="Sistema" />
+          <Tab label="Banco de Dados" />
         </Tabs>
 
         <TabPanel value={tabAtiva} index={0}>
@@ -60,12 +61,7 @@ export default function TelaConfiguracoes() {
 
         <TabPanel value={tabAtiva} index={2}>
           <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Configurações do Sistema
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Banco de dados, backup e outras configurações técnicas.
-            </Typography>
+            <TelaConfiguracaoBanco />
           </Box>
         </TabPanel>
       </Paper>
